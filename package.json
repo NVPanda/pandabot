@@ -1,0 +1,18 @@
+{
+  "name": "pandabot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/main"
+  },
+  "keywords": [],
+  "author": "NVPanda",
+  "license": "ISC",
+  "description": "A simple bot for whatsapp based on Gui Dev Skybot and SpiderBot X",
+  "dependencies": {
+    "baileys": "github:WhiskeySockets/Baileys",
+    "pandabot": "file:",
+    "pino": "^9.6.0",
+    "readline": "^1.3.0"
+  }
+}
