@@ -1,23 +1,22 @@
-const { downloadContentFromMessage} = require("@whiskeysockets/baileys");
-const readline = require("readline");
-const path = require("path");
-const { writeFile } = require("fs/promises");
-const fs = require("fs");
-const { TEMP_DIR, COMMANDS_DIR } = require("../configs");
+import { downloadContentFromMessage } from "@whiskeysockets/baileys";
+import { createInterface } from "readline";
+import { resolve as _resolve, join } from "path";
+import { writeFile } from "fs/promises";
+import { readdirSync } from "fs";
+import { TEMP_DIR, COMMANDS_DIR, PREFIX } from "../configs";
 
-
-exports.question = (message) => {
-    const rl = readline.createInterface({
+export function question(message) {
+    const rl = createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 
     return new Promise((resolve) => rl.question(message, resolve));
-};
+}
 
-exports.onlyNumbers = (text) => text.replace(/[^0-9]/g, '');
+export function onlyNumbers(text) { return text.replace(/[^0-9]/g, ''); }
 
-exports.extractDataFromMessage = (wMessage) => {
+export function extractDataFromMessage(wMessage) {
     const textMessage = wMessage.message?.conversation;
     const extendedTextMessage = wMessage.message?.extendedTextMessage;
     const extendedTextMessageText = extendedTextMessage?.Text;
@@ -47,7 +46,7 @@ exports.extractDataFromMessage = (wMessage) => {
     const [command, ...args] = fullMessage.split(" ");
     const prefix = command.charAt(0);
 
-    const commandWithoutPrefix = command.replace(new RegExp(`^[${PREFIX}]+`), prefix);
+    const commandWithoutPrefix = command.replace(new RegExp(`^[${PREFIX}]+`), "");
 
     return {
         remoteJid: wMessage?.key?.remoteJid,
@@ -58,45 +57,51 @@ exports.extractDataFromMessage = (wMessage) => {
         replyJid,
         args: this.splitByChars(args.join(" "), ["\\", "|", "/"]),
     };
-};
+}
 
-exports.splitByChars = (str, characters) => {
+export function splitByChars(str, characters) {
     characters = characters.map((char) => (char === "\\" ? "\\\\" : char));
     const regex = new RegExp(`[${characters.join("")}]`);
 
-    return str.split(regex).map((str.trim())).filter(Boolean);
-};
+    return str.split(regex).map(str => str.trim()).filter(Boolean);
+}
 
-exports.formatCommand = (text) => {
+export function formatCommand(text) {
     return this.onlyLettersAndNumbers(
         this.removeAccentsAndSpecialCharacters(text.toLocaleLowerCase().trim())
     );
-};
+}
 
-exports.removeAccentsAndSpecialCharacters = (text) => {
-    if (!text) return "";
+export function onlyLettersAndNumbers(text) {
+    return text.replace(/[^a-zA-Z0-9]/g, "");
+}
 
-    return text.normalize("NFD").replace(/\u0300-\u036f]/g, "");
-};
+export function removeAccentsAndSpecialCharacters(text) {
+    if (!text) {
+        return "";
+    }
 
-exports.bayleisIs = (wMessage, context) => {
+    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+export function bayleisIs(wMessage, context) {
     return !!this.getContent(wMessage, context);
-};
+}
 
-exports.getContent = (wMessage, context) => {
+export function getContent(wMessage, context) {
     return (
         wMessage.message?.[`${context}Message`] || wMessage.message?.extendedTextMessage?.quotedMessage?.[`${context}`]
-    )
-};
+    );
+}
 
-exports.download = async (wMessage, fileName, context, extension) => {
+export async function download(wMessage, fileName, context, extension) {
     const content = this.getContent(wMessage, context);
 
     if (!content) {
         return null;
     }
-    
-    const string = await downloadContentFromMessage(content, context);
+
+    const stream = await downloadContentFromMessage(content, context);
 
     let buffer = Buffer.from([]);
 
@@ -104,24 +109,51 @@ exports.download = async (wMessage, fileName, context, extension) => {
         buffer = Buffer.concat([buffer, chunk]);
     }
 
-    const filePath = path.resolve(TEMP_DIR, `${fileName}.${extension}`);
+    const filePath = _resolve(TEMP_DIR, `${fileName}.${extension}`);
 
     await writeFile(filePath, buffer);
 
     return filePath;
-};
+}
 
-exports.findCommandImport = () => {};
+export function findCommandImport(commandName) {
+    const command = this.readCommandImport();
 
-exports.readCommandImport = () => {
-    const subdirectories = fs.readdirSync(COMMANDS_DIR, {withFileTypes: true}).filter((directory) => directory.isDirectory()).map((directory) => directory.name);
+    let typeReturn = ""; // comando que verifica qual é o tipo de pessoa Admin, Member or Owner
+    let targeCommandReturn = null;
+
+    for (const [type, commands] of Object.entries(command)) {
+        if (!commands.length) {
+            continue;
+        }
+
+        const targeCommand = commands.find(cmd => cmd.commands.map(cmd => this.formatCommand(cmd)).includes(commandName));
+
+        if (targeCommand) {
+            typeReturn = type;
+            targeCommandReturn = targeCommand;
+            break;
+        }
+    }
+
+    return {
+        type: typeReturn,
+        command: targeCommandReturn,
+    };
+}
+
+export function readCommandImport() {
+    const subdirectories = readdirSync(COMMANDS_DIR, { withFileTypes: true }).filter((directory) => directory.isDirectory()).map((directory) => directory.name);
 
     const commandImports = {};
 
     for (const subdir of subdirectories) {
-        const subdirectoyPath = path.join(COMMANDS_DIR, subdir);
-        const files = fs.readdirSync(subdirectoyPath).filter((file) => !file.startsWith("_") && (file.endsWith(".js") || file.endsWith(".ts")));
+        const subdirectoyPath = join(COMMANDS_DIR, subdir);
+        const files = readdirSync(subdirectoyPath).filter((file) => !file.startsWith("_") && (file.endsWith(".js") || file.endsWith(".ts")));
+
+        commandImports[subdir] = files;
 
     }
 
-};
+    return commandImports;
+}

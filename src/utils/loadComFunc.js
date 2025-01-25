@@ -1,8 +1,8 @@
-const { extractDataFromMessage, baileysIs } = require(".");
-const { BOT_EMOJI } = require("../configs");
-const fs = require("fs");
+import { extractDataFromMessage, baileysIs } from ".";
+import { BOT_EMOJI } from "../configs";
+import { readFileSync } from "fs";
 
-exports.loadCommonFunctions = ({ socket, wMessage }) => {
+export function loadCommonFunctions({ socket, wMessage }) {
     const { remoteJid, prefix, commandName, args, userJid, isReply, replyJid } = extractDataFromMessage(wMessage);
 
     const isImage = bayleisIs(wMessage, "image");
@@ -34,7 +34,7 @@ exports.loadCommonFunctions = ({ socket, wMessage }) => {
             react: {
                 text: emoji,
                 key: wMessage.key,
-            };
+            }
         });
     };
 
@@ -76,14 +76,14 @@ exports.loadCommonFunctions = ({ socket, wMessage }) => {
 
     const sendStickerFromFile = async (file) => {
         return await socket.sendMessage(remoteJid, {
-            sticker: fs.readFileSync(file),
+            sticker: readFileSync(file),
         });
     };
 
 
     const sendImageFromFile = async (file) => {
         return await socket.sendMessage(remoteJid, {
-            image: fs.readFileSync(file),
+            image: readFileSync(file),
         });
     };
 
@@ -115,5 +115,5 @@ exports.loadCommonFunctions = ({ socket, wMessage }) => {
         downloadSticker,
         downloadVideo,
     };
-};
+}
 

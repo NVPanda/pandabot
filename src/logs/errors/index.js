@@ -1,6 +1,6 @@
 const { DangerError, InvalidParameterError, WarningError } = require("./DangerErros","./InvalidParameterError", "./WarningError");
 
-module.exports = {
+export default {
     DangerError,
     InvalidParameterError,
     WarningError,

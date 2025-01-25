@@ -1,2 +1,2 @@
-exports.verifyPrefix = (prefix) => PREFIX === prefix;
-exports.hasTypeOrCommand = ({type, command}) => type && command;
+export function verifyPrefix(prefix) { return PREFIX === prefix; }
+export function hasTypeOrCommand({type, command}) { return type && command; }

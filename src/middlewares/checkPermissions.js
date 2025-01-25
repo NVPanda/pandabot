@@ -1,4 +1,4 @@
-exports.checkPermission = async ({type, socket, userJid, remoteJid}) {
+export async function checkPermission({type, socket, userJid, remoteJid}) {
     if (type === 'member') {
         return true;
     }
@@ -27,4 +27,4 @@ exports.checkPermission = async ({type, socket, userJid, remoteJid}) {
     }
 
     return false;
-};
+}

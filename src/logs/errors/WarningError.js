@@ -1,4 +1,3 @@
-
 class WarningError extends Error {
     constructor(message) {
         super(message);

@@ -1,10 +1,8 @@
-module.exports = {
-    name: "Nome do Comando",
-    description: "Descrição do Comando",
-    commands: ["comando1", "comando2"],
-    usage: `${PREFIX}comando`,
-    handle: async ({}) => {
-        // Código do comando.
-    },
-};
+export const name = "Nome do Comando";
+export const description = "Descrição do Comando";
+export const commands = ["comando1", "comando2"];
+export const usage = `${PREFIX}comando`;
+export async function handle({ }) {
+    // Código do comando.
+}
 

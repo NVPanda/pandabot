@@ -1,10 +1,10 @@
-const { verifyPrefix, hasTypeOrCommand } = require("../middlewares");
-const { checkPermission } = require("../middlewares/checkPermissions");
-const { DangerError, InvalidParameterError, WarningError } = require("../logs/errors");
-const { findCommandImport } = require(".");
+import { verifyPrefix, hasTypeOrCommand } from "../middlewares";
+import { checkPermission } from "../middlewares/checkPermissions";
+import { DangerError, InvalidParameterError, WarningError } from "../logs/errors";
+import { findCommandImport } from ".";
 
 
-exports.dynamicCommand = async (paramsHandler) => {
+export async function dynamicCommand(paramsHandler) {
     const { commandName, prefix, sendWarningReply, sendErrorReply } = paramsHandler;
 
     const { type, command } = findCommandImport(commandName);
@@ -43,4 +43,4 @@ exports.dynamicCommand = async (paramsHandler) => {
             )
         }
     }
-};
+}

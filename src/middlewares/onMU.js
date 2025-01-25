@@ -1,9 +1,9 @@
-const { loadCommonFunctions } = require("../utils/loadComFunc");
-const { dynamicCommand } = require("../utils/dynamicCommand");
+import { loadCommonFunctions } from "./utils/loadComFunc.js";
+import { dynamicCommand } from "./utils/dynamicCommand.js";
 
 // onMessagesUpsert
 
-exports.onMessageUpsert = async ({ socket, messages}) => {
+export async function onMessageUpsert({ socket, messages}) {
     
     if (!messages.length) {
         return;
@@ -13,4 +13,4 @@ exports.onMessageUpsert = async ({ socket, messages}) => {
     const commonFunc = loadCommonFunctions({ socket, wMessage });
 
     await dynamicCommand(commonFunc); 
-};
+}
